@@ -12,31 +12,31 @@
     <pre id="status"></pre>
 
     <script>
-      async function lerDados(state) {
-        // Exemplo: ler range A1:B2 de uma planilha (substitua SPREADSHEET_ID)
-        const SPREADSHEET_ID = localStorage.getItem("id_planilha");
-        const endpoint = `spreadsheets/${SPREADSHEET_ID}/values/A1:J11`;
+      // async function lerDados(state) {
+      //   // Exemplo: ler range A1:B2 de uma planilha (substitua SPREADSHEET_ID)
+      //   const SPREADSHEET_ID = localStorage.getItem("id_planilha");
+      //   const endpoint = `spreadsheets/${SPREADSHEET_ID}/values/A1:J11`;
 
-        const resp = await fetch(
-          "https://meu-financeiro-worker.alexro-kcoal.workers.dev/api/sheets",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ state: state, method: "GET", endpoint }),
-          }
-        );
+      //   const resp = await fetch(
+      //     "https://meu-financeiro-worker.alexro-kcoal.workers.dev/api/sheets",
+      //     {
+      //       method: "POST",
+      //       headers: { "Content-Type": "application/json" },
+      //       body: JSON.stringify({ state: state, method: "GET", endpoint }),
+      //     }
+      //   );
 
-        const statusEl = document.getElementById("status");
+      //   const statusEl = document.getElementById("status");
 
-        const data = await resp.json();
-        statusEl.textContent += "\nResposta da Sheets API:\n" + JSON.stringify(data, null, 2);
-      }
+      //   const data = await resp.json();
+      //   statusEl.textContent += "\nResposta da Sheets API:\n" + JSON.stringify(data, null, 2);
+      // }
 
-      if (!localStorage.getItem("id_planilha")) {
-        let idPlanilha = prompt("Por favor, informe o ID da planilha", "ID da planilha aqui...");
+      // if (!localStorage.getItem("id_planilha")) {
+      //   let idPlanilha = prompt("Por favor, informe o ID da planilha", "ID da planilha aqui...");
 
-        localStorage.setItem("id_planilha", idPlanilha);
-      }
+      //   localStorage.setItem("id_planilha", idPlanilha);
+      // }
 
       function checkLogin() {
         var state = localStorage.getItem("state");
@@ -51,8 +51,7 @@
 
       async function logout() {
         await fetch(
-          "https://meu-financeiro-worker.alexro-kcoal.workers.dev/logout?state=" +
-            localStorage.getItem("state"),
+          window.APP_CONFIG.WORKER_URL + "/logout?state=" + localStorage.getItem("state"),
           {
             method: "GET",
           }
@@ -62,9 +61,25 @@
         window.location.href = "./login.html";
       }
 
-      window.addEventListener("load", () => {
+      window.addEventListener("load", async () => {
+        window.APP_CONFIG = {};
+
+        async function loadConfig(env) {
+          const response = await fetch(`config.${env}.json`);
+          window.APP_CONFIG = await response.json();
+          console.log("Configuração carregada:", window.APP_CONFIG);
+        }
+
+        if (location.hostname.includes("127.0.0.1") || location.hostname.includes("localhost")) {
+          await loadConfig("dev");
+        } else {
+          await loadConfig("prd");
+        }
+
         const params = new URLSearchParams(window.location.search);
         const redirectState = params.get("state");
+
+        window.history.replaceState({}, document.title, window.location.pathname);
 
         if (redirectState) {
           localStorage.setItem("state", redirectState);
@@ -75,7 +90,7 @@
         state = localStorage.getItem("state");
 
         if (state) {
-          lerDados(state);
+          // lerDados(state);
         }
       });
     </script>

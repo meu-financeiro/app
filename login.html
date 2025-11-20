@@ -127,34 +127,48 @@
     <footer>© 2025 Meu Financeiro</footer>
 
     <script>
-      const CLIENT_ID = "531532816820-3mvo3orhe7md3ah269o6v8bcs6tv5cjc.apps.googleusercontent.com";
-      const REDIRECT_URI = "https://meu-financeiro-worker.alexro-kcoal.workers.dev/callback";
-      const SCOPES = ["openid", "profile", "email"].join(" ");
+      window.addEventListener("load", async () => {
+        window.APP_CONFIG = {};
 
-      const statusEl = document.getElementById("status");
+        async function loadConfig(env) {
+          const response = await fetch(`config.${env}.json`);
+          window.APP_CONFIG = await response.json();
+          console.log("Configuração carregada:", window.APP_CONFIG);
+        }
 
-      function randomState(len = 16) {
-        const arr = new Uint8Array(len);
-        crypto.getRandomValues(arr);
-        return Array.from(arr, (dec) => ("0" + dec.toString(16)).slice(-2)).join("");
-      }
+        if (location.hostname.includes("127.0.0.1") || location.hostname.includes("localhost")) {
+          await loadConfig("dev");
+        } else {
+          await loadConfig("prd");
+        }
 
-      document.getElementById("login").addEventListener("click", handleGoogleSignIn);
+        const SCOPES = ["openid", "profile", "email"].join(" ");
 
-      function handleGoogleSignIn() {
-        const state = randomState(12);
+        const statusEl = document.getElementById("status");
 
-        const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-        authUrl.searchParams.set("client_id", CLIENT_ID);
-        authUrl.searchParams.set("redirect_uri", REDIRECT_URI);
-        authUrl.searchParams.set("response_type", "code");
-        authUrl.searchParams.set("scope", SCOPES);
-        authUrl.searchParams.set("access_type", "offline");
-        authUrl.searchParams.set("prompt", "consent");
-        authUrl.searchParams.set("state", state);
+        function randomState(len = 16) {
+          const arr = new Uint8Array(len);
+          crypto.getRandomValues(arr);
+          return Array.from(arr, (dec) => ("0" + dec.toString(16)).slice(-2)).join("");
+        }
 
-        window.location.href = authUrl.toString();
-      }
+        document.getElementById("login").addEventListener("click", handleGoogleSignIn);
+
+        function handleGoogleSignIn() {
+          const state = randomState(12);
+
+          const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+          authUrl.searchParams.set("client_id", window.APP_CONFIG.CLIENT_ID);
+          authUrl.searchParams.set("redirect_uri", window.APP_CONFIG.WORKER_URL + "/callback");
+          authUrl.searchParams.set("response_type", "code");
+          authUrl.searchParams.set("scope", SCOPES);
+          authUrl.searchParams.set("access_type", "offline");
+          authUrl.searchParams.set("prompt", "consent");
+          authUrl.searchParams.set("state", state);
+
+          window.location.href = authUrl.toString();
+        }
+      });
     </script>
   </body>
 </html>
