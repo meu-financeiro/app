@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login com Google</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", "Roboto", sans-serif;
+        background: #111827;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      #login-container {
+        display: flex;
+        justify-content: center;
+      }
+
+      .login-card {
+        background: #1f2937;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 40px 50px;
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: white;
+      }
+
+      p {
+        margin-bottom: 25px;
+        color: white;
+      }
+
+      #status {
+        margin-top: 16px;
+        color: white;
+        font-size: 0.9rem;
+      }
+
+      footer {
+        position: fixed;
+        bottom: 15px;
+        width: 100%;
+        text-align: center;
+        font-size: 0.8rem;
+        color: white;
+      }
+
+      /* === BOTÃO GOOGLE CUSTOM === */
+      .google-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 16px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        background-color: #fff;
+        color: #3c4043;
+        font-family: "Roboto", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: box-shadow 0.2s ease, background-color 0.2s ease;
+      }
+
+      .google-btn:hover {
+        background-color: #f8faff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .google-icon {
+        width: 18px;
+        height: 18px;
+      }
+
+      .google-btn:active {
+        background-color: #e8f0fe;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-card">
+      <h1>Bem-vindo</h1>
+      <p>Entre com sua conta Google para continuar</p>
+
+      <div id="login-container">
+        <button id="login" class="google-btn">
+          <img
+            class="google-icon"
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google logo"
+          />
+          Entrar com Google
+        </button>
+        <pre id="status"></pre>
+      </div>
+    </div>
+
+    <footer>© 2025 Meu Financeiro</footer>
+
+    <script>
+      const CLIENT_ID = "531532816820-3mvo3orhe7md3ah269o6v8bcs6tv5cjc.apps.googleusercontent.com";
+      const REDIRECT_URI = "https://meu-financeiro-worker.alexro-kcoal.workers.dev/callback";
+      const SCOPES = ["openid", "profile", "email"].join(" ");
+
+      const statusEl = document.getElementById("status");
+
+      function randomState(len = 16) {
+        const arr = new Uint8Array(len);
+        crypto.getRandomValues(arr);
+        return Array.from(arr, (dec) => ("0" + dec.toString(16)).slice(-2)).join("");
+      }
+
+      document.getElementById("login").addEventListener("click", handleGoogleSignIn);
+
+      function handleGoogleSignIn() {
+        const state = randomState(12);
+
+        const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+        authUrl.searchParams.set("client_id", CLIENT_ID);
+        authUrl.searchParams.set("redirect_uri", REDIRECT_URI);
+        authUrl.searchParams.set("response_type", "code");
+        authUrl.searchParams.set("scope", SCOPES);
+        authUrl.searchParams.set("access_type", "offline");
+        authUrl.searchParams.set("prompt", "consent");
+        authUrl.searchParams.set("state", state);
+
+        window.location.href = authUrl.toString();
+      }
+    </script>
+  </body>
+</html>

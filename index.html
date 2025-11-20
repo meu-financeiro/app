@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sheets OAuth Demo</title>
+  </head>
+  <body>
+    <button class="google-btn" onclick="logout()">Sair</button>
+    <h1>Aplicação</h1>
+
+    <pre id="status"></pre>
+
+    <script>
+      async function lerDados(state) {
+        // Exemplo: ler range A1:B2 de uma planilha (substitua SPREADSHEET_ID)
+        const SPREADSHEET_ID = localStorage.getItem("id_planilha");
+        const endpoint = `spreadsheets/${SPREADSHEET_ID}/values/A1:J11`;
+
+        const resp = await fetch(
+          "https://meu-financeiro-worker.alexro-kcoal.workers.dev/api/sheets",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ state: state, method: "GET", endpoint }),
+          }
+        );
+
+        const statusEl = document.getElementById("status");
+
+        const data = await resp.json();
+        statusEl.textContent += "\nResposta da Sheets API:\n" + JSON.stringify(data, null, 2);
+      }
+
+      if (!localStorage.getItem("id_planilha")) {
+        let idPlanilha = prompt("Por favor, informe o ID da planilha", "ID da planilha aqui...");
+
+        localStorage.setItem("id_planilha", idPlanilha);
+      }
+
+      function checkLogin() {
+        var state = localStorage.getItem("state");
+
+        if (typeof state === "string" && state.trim() !== "") {
+          return true;
+        } else {
+          window.location.href = "./login.html";
+          return false;
+        }
+      }
+
+      async function logout() {
+        await fetch(
+          "https://meu-financeiro-worker.alexro-kcoal.workers.dev/logout?state=" +
+            localStorage.getItem("state"),
+          {
+            method: "GET",
+          }
+        );
+
+        localStorage.removeItem("state");
+        window.location.href = "./login.html";
+      }
+
+      window.addEventListener("load", () => {
+        const params = new URLSearchParams(window.location.search);
+        const redirectState = params.get("state");
+
+        if (redirectState) {
+          localStorage.setItem("state", redirectState);
+        }
+
+        checkLogin();
+
+        state = localStorage.getItem("state");
+
+        if (state) {
+          lerDados(state);
+        }
+      });
+    </script>
+  </body>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</html>
