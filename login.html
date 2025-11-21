@@ -9,8 +9,7 @@
     <script async defer src="https://accounts.google.com/gsi/client"></script>
 
     <!-- Scripts -->
-    <script defer src="src/config/config.js"></script>
-    <script defer src="src/auth/auth.js"></script>
+    <script type="module" src="src/login/login.js" defer></script>
 
     <style>
       * {
@@ -119,7 +118,7 @@
       <p>Entre com sua conta Google para continuar</p>
 
       <div id="login-container">
-        <button id="login" class="google-btn">
+        <button id="login-btn" class="google-btn">
           <img
             class="google-icon"
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -127,7 +126,6 @@
           />
           Entrar com Google
         </button>
-        <pre id="status"></pre>
       </div>
     </div>
 

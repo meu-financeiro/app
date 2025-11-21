@@ -15,11 +15,10 @@
     <script async defer src="https://accounts.google.com/gsi/client"></script>
 
     <!-- Scripts -->
-    <script defer src="src/config/config.js"></script>
-    <script defer src="src/app.js"></script>
+    <script type="module" src="src/main.js" defer></script>
   </head>
   <body>
-    <button class="google-btn" onclick="logout()">Sair</button>
+    <button id="logout-btn">Sair</button>
     <h1>Aplicação</h1>
     <pre id="status"></pre>
   </body>
