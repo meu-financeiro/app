@@ -5,74 +5,22 @@
     <title>Meu Financeiro</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="apple-mobile-web-app-title" content="Meu Financeiro" />
-    <link rel="icon" type="image/png" href="assets/icons/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
-    <link rel="shortcut icon" href="assets/icons/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png" />
-    <link rel="manifest" href="meu-financeiro.webmanifest" />
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
+    <link rel="shortcut icon" href="favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="favicon/site.webmanifest" />
+
+    <!-- Script de autenticação do Google -->
+    <script async defer src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- Scripts -->
+    <script defer src="src/config/config.js"></script>
+    <script defer src="src/app.js"></script>
   </head>
   <body>
     <button class="google-btn" onclick="logout()">Sair</button>
     <h1>Aplicação</h1>
-
     <pre id="status"></pre>
-
-    <script>
-      function checkLogin() {
-        var state = localStorage.getItem("state");
-
-        if (typeof state === "string" && state.trim() !== "") {
-          return true;
-        } else {
-          window.location.href = "./login.html";
-          return false;
-        }
-      }
-
-      async function logout() {
-        await fetch(
-          window.APP_CONFIG.WORKER_URL + "/logout?state=" + localStorage.getItem("state"),
-          {
-            method: "GET",
-          }
-        );
-
-        localStorage.removeItem("state");
-        window.location.href = "./login.html";
-      }
-
-      window.addEventListener("load", async () => {
-        window.APP_CONFIG = {};
-
-        async function loadConfig(env) {
-          const response = await fetch(`config.${env}.json`);
-          window.APP_CONFIG = await response.json();
-          console.log("Configuração carregada:", window.APP_CONFIG);
-        }
-
-        if (location.hostname.includes("127.0.0.1") || location.hostname.includes("localhost")) {
-          await loadConfig("dev");
-        } else {
-          await loadConfig("prd");
-        }
-
-        const params = new URLSearchParams(window.location.search);
-        const redirectState = params.get("state");
-        window.history.replaceState({}, document.title, window.location.pathname);
-
-        if (redirectState) {
-          localStorage.setItem("state", redirectState);
-        }
-
-        checkLogin();
-
-        state = localStorage.getItem("state");
-
-        if (state) {
-          // lerDados(state);
-        }
-      });
-    </script>
   </body>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </html>

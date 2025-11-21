@@ -4,7 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login com Google</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Script de autenticação do Google -->
+    <script async defer src="https://accounts.google.com/gsi/client"></script>
+
+    <!-- Scripts -->
+    <script defer src="src/config/config.js"></script>
+    <script defer src="src/auth/auth.js"></script>
+
     <style>
       * {
         box-sizing: border-box;
@@ -125,50 +132,5 @@
     </div>
 
     <footer>© 2025 Meu Financeiro</footer>
-
-    <script>
-      window.addEventListener("load", async () => {
-        window.APP_CONFIG = {};
-
-        async function loadConfig(env) {
-          const response = await fetch(`config.${env}.json`);
-          window.APP_CONFIG = await response.json();
-          console.log("Configuração carregada:", window.APP_CONFIG);
-        }
-
-        if (location.hostname.includes("127.0.0.1") || location.hostname.includes("localhost")) {
-          await loadConfig("dev");
-        } else {
-          await loadConfig("prd");
-        }
-
-        const SCOPES = ["openid", "profile", "email"].join(" ");
-
-        const statusEl = document.getElementById("status");
-
-        function randomState(len = 16) {
-          const arr = new Uint8Array(len);
-          crypto.getRandomValues(arr);
-          return Array.from(arr, (dec) => ("0" + dec.toString(16)).slice(-2)).join("");
-        }
-
-        document.getElementById("login").addEventListener("click", handleGoogleSignIn);
-
-        function handleGoogleSignIn() {
-          const state = randomState(12);
-
-          const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-          authUrl.searchParams.set("client_id", window.APP_CONFIG.CLIENT_ID);
-          authUrl.searchParams.set("redirect_uri", window.APP_CONFIG.WORKER_URL + "/callback");
-          authUrl.searchParams.set("response_type", "code");
-          authUrl.searchParams.set("scope", SCOPES);
-          authUrl.searchParams.set("access_type", "offline");
-          authUrl.searchParams.set("prompt", "consent");
-          authUrl.searchParams.set("state", state);
-
-          window.location.href = authUrl.toString();
-        }
-      });
-    </script>
   </body>
 </html>
