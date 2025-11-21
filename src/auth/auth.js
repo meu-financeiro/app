@@ -18,6 +18,8 @@ export function handleAuthState() {
 
   if (!state || state.trim() === "") {
     window.location.href = "./login.html";
+  } else {
+    AppConfig.state = state;
   }
 }
 

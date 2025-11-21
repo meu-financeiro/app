@@ -24,9 +24,6 @@ async function loadConfig(env) {
     // Atualiza todas as propriedades do objeto exportado
     Object.assign(AppConfig, json);
 
-    // Trava o objeto para não permitir alterações posteriores
-    Object.freeze(AppConfig);
-
     console.log(`Configuração (${env}) carregada:`, AppConfig);
   } catch (error) {
     console.error("Erro ao carregar configuração:", error);
